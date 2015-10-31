@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script language="JavaScript">
+        var visited = new Array();
+        var work_set = new Array();
+        function calc_h(i, j, add, dim, maze){
+            var h = add+1;
+            var g = dim*2-i-j-2;
+            maze[i][j] = h+g ;
+            var res = [i,j,h,g];
+            return res;
+            }
+
+        function fetch_children(m, n, add, maze, dim, arr){
+            if (m-1>0 && maze[m-1][n]==0) arr.push(calc_h(m-1,n,add, dim, maze));
+            if (m-1>0 && n-1>0 && maze[m-1][n-1]==0) arr.push(calc_h(m-1, n-1, add, dim, maze));
+            if (n-1>0 && maze[m][n-1]==0) arr.push(calc_h(m, n-1, add, dim, maze));
+            if (m-1>0 && n+1<dim && maze[m-1][n+1]==0) arr.push(calc_h( m-1, n+1, add, dim, maze));
+            if (n+1<dim && maze[m][n+1]==0) arr.push(calc_h(m, n+1, add, dim, maze));
+            if (m+1<dim && n-1>0 && maze[m+1][n-1]==0) arr.push(calc_h(m+1, n-1, add, dim, maze));
+            if (m+1<dim && n+1<dim && maze[m+1][n+1]=='0') arr.push(calc_h(m+1, n+1, add, dim, maze));
+            if (m+1<dim && maze[m+1][n]=='0') arr.push(calc_h(m+1, n, add, dim, maze));
+        }
+        function generate(dim){
+            var maze = new Array;
+            for (var i=0; i<dim; i++){
+                maze.push(new Array);
+                for (var j=0; j<dim; j++){
+                    if(i==0 && j==0) maze[i].push("S");
+                    else{
+                        if(i==(dim-1) && j==(dim-1)) maze[i].push("G");
+                        else maze[i].push(Math.floor(Math.random()*10/8)); //make sure that the start is in the upper left corner and the goal is at the lower right corner
+                    }
+                }
+            }
+            fetch_children(0,0,0,maze, dim, work_set);
+//for(var i=0; i<15; i++){
+//    work_set.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
+//    fetch_children(work_set[0][0], work_set[0][1], work_set[0][2], maze, dim, work_set);
+//    visited.push(work_set[0]);
+//    work_set.reverse();
+//    work_set.pop();
+//}
+//            visited.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
+//            console.debug(visited);
+//
+            do{
+                work_set.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
+                fetch_children(work_set[0][0], work_set[0][1], work_set[0][2], maze, dim, work_set);
+                visited.push(work_set[0]);
+                work_set.reverse();
+                work_set.pop();
+                work_set.reverse();
+            }
+            while (work_set[0][0]!= dim-1 && work_set[0][1]!= dim-1)
+console.debug(work_set);
+            //plotting portion of the source
+            var source='';
+            source +='<table  border="1" style="width:'+30*dim+'px; height:'+30*dim+'px;">';
+            for (var k=0; k<dim; k++){
+                source +='<tr>';
+                for (var l=0; l<dim; l++){
+                    if (maze[k][l]=='S') source +='<td id="'+k+'_'+l+'"bgcolor=#aaf>'+maze[k][l]+'</td>';
+                    else if (maze[k][l]=='G') source +='<td id="'+k+'_'+l+'"bgcolor=#2f2>'+maze[k][l]+'</td>';
+                    else if (maze[k][l]==1) source +='<td id="'+k+'_'+l+'"bgcolor=#000>'+maze[k][l]+'</td>';
+                    else source +='<td id="'+k+'_'+l+'">'+maze[k][l]+'</td>';
+                }
+                source +='</tr>';
+            }
+            source +='</table>';
+            document.getElementById('table').innerHTML = source;
+            return maze;
+
+        }
+    </script>
+</head>
+<body onload="generate(10);">
+<span id="table"></span>
+</body>
+</html>
