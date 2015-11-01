@@ -6,6 +6,8 @@
     <script language="JavaScript">
         var visited = new Array();
         var work_set = new Array();
+
+        //function to evaluate each node and its heuristics - the path from the start, the path till goal (linear) and its coordinates
         function calc_h(i, j, add, dim, maze){
             var h = add+1;
             var g = dim*2-i-j-2;
@@ -14,8 +16,9 @@
             return res;
             }
 
+        //function to fetch all child nodes and determine which one to expand next
         function fetch_children(m, n, add, maze, dim, arr){
-            if (m-1>0 && maze[m-1][n]==0) arr.push(calc_h(m-1,n,add, dim, maze));
+            if (m-1>0 && maze[m-1][n]==0 ) arr.push(calc_h(m-1,n,add, dim, maze));
             if (m-1>0 && n-1>0 && maze[m-1][n-1]==0) arr.push(calc_h(m-1, n-1, add, dim, maze));
             if (n-1>0 && maze[m][n-1]==0) arr.push(calc_h(m, n-1, add, dim, maze));
             if (m-1>0 && n+1<dim && maze[m-1][n+1]==0) arr.push(calc_h( m-1, n+1, add, dim, maze));
@@ -24,6 +27,8 @@
             if (m+1<dim && n+1<dim && maze[m+1][n+1]=='0') arr.push(calc_h(m+1, n+1, add, dim, maze));
             if (m+1<dim && maze[m+1][n]=='0') arr.push(calc_h(m+1, n, add, dim, maze));
         }
+
+        //maze generation function
         function generate(dim){
             var maze = new Array;
             for (var i=0; i<dim; i++){
@@ -37,16 +42,8 @@
                 }
             }
             fetch_children(0,0,0,maze, dim, work_set);
-//for(var i=0; i<15; i++){
-//    work_set.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
-//    fetch_children(work_set[0][0], work_set[0][1], work_set[0][2], maze, dim, work_set);
-//    visited.push(work_set[0]);
-//    work_set.reverse();
-//    work_set.pop();
-//}
-//            visited.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
-//            console.debug(visited);
-//
+
+            //loop till the heuristics finds the goal
             do{
                 work_set.sort(function(a, b){return (a[2]+a[3])-(b[2]+b[3])});
                 fetch_children(work_set[0][0], work_set[0][1], work_set[0][2], maze, dim, work_set);
@@ -56,7 +53,19 @@
                 work_set.reverse();
             }
             while (work_set[0][0]!= dim-1 && work_set[0][1]!= dim-1)
-console.debug(work_set);
+//            console.debug(work_set);
+
+            //added method to show not only which nodes got calculated, but also which ones were actually visited - commented out the lines for the different methods:
+//                - (the current one) highlighting the nodes
+//                - underscoring and bolding the heuristics values of the visited nodes
+//                - replacing the visited node heuristics with the letter 'v' - not quite useful, but still a quick and dirty highlighting method.
+
+            for (var z=0; z<visited.length; z++){
+                maze[visited[z][0]][visited[z][1]] = '<span style="background-color: chartreuse">'+maze[visited[z][0]][visited[z][1]]+'</span>' ;
+//                maze[visited[z][0]][visited[z][1]] = '<b><u>'+maze[visited[z][0]][visited[z][1]]+'</u></b>' ;
+//                document.getElementById(visited[z][0] + '_' + visited[z][1]).bgcolor = '#ccc' ;
+            }
+
             //plotting portion of the source
             var source='';
             source +='<table  border="1" style="width:'+30*dim+'px; height:'+30*dim+'px;">';
@@ -72,8 +81,9 @@ console.debug(work_set);
             }
             source +='</table>';
             document.getElementById('table').innerHTML = source;
-            return maze;
 
+
+//            return maze;
         }
     </script>
 </head>
